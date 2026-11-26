@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Player\PlayerFracture.cs" />
     <Compile Include="Assets\Scripts\Player\PlayerGravityMove.cs" />
+    <Compile Include="Assets\Scripts\Player\PlayerDash.cs" />
     <Compile Include="Assets\Scripts\World\SpikesHazard.cs" />
   </ItemGroup>
   <ItemGroup>
