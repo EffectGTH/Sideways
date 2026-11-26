@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public enum RoomDirection
@@ -37,6 +36,33 @@ public static class RoomDirectionUtility
 
             default:
                 return Vector3Int.zero;
+        }
+    }
+
+    public static RoomDirection GetOpposite(RoomDirection direction)
+    {
+        switch (direction)
+        {
+            case RoomDirection.Left:
+                return RoomDirection.Right;
+
+            case RoomDirection.Right:
+                return RoomDirection.Left;
+
+            case RoomDirection.Up:
+                return RoomDirection.Down;
+
+            case RoomDirection.Down:
+                return RoomDirection.Up;
+
+            case RoomDirection.Forward:
+                return RoomDirection.Back;
+
+            case RoomDirection.Back:
+                return RoomDirection.Forward;
+
+            default:
+                return RoomDirection.Left;
         }
     }
 }

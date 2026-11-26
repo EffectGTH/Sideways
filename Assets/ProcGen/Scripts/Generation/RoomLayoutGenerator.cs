@@ -15,28 +15,21 @@ public class RoomLayoutGenerator : MonoBehaviour
         RoomDirection.Back
     };
 
-    private static readonly RoomDirection[] PositiveDirections =
-    {
-        RoomDirection.Right,
-        RoomDirection.Up,
-        RoomDirection.Forward
-    };
-
     [Header("Generation Settings")]
     [SerializeField, Min(1)] private int roomCount = 15;
-    [SerializeField, Min(1f)] private float roomSpacing = 10f;
-    [SerializeField, Min(0.1f)] private float roomMarkerSize = 4f;
-    [SerializeField, Min(0.1f)] private float connectionWidth = 0.5f;
+    [SerializeField] private Vector3 roomSpacing = new Vector3(10f, 10f, 10f);
 
     [Header("References")]
     [SerializeField] private GameObject roomPrefab;
     [SerializeField] private Transform generatedParent;
+    [SerializeField] private RoomTransitionManager transitionManager;
 
     [Header("Random Settings")]
     [SerializeField] private bool useFixedSeed = true;
     [SerializeField] private int fixedSeed = 12345;
 
-    private readonly Dictionary<Vector3Int, RoomNode> rooms = new Dictionary<Vector3Int, RoomNode>();
+    private readonly Dictionary<Vector3Int, RoomNode> rooms =
+        new Dictionary<Vector3Int, RoomNode>();
 
     private System.Random random;
 
@@ -53,9 +46,23 @@ public class RoomLayoutGenerator : MonoBehaviour
             return;
         }
 
-        if (roomSpacing <= roomMarkerSize)
+        if (roomPrefab.GetComponent<RoomInstance>() == null)
         {
-            Debug.LogError("Room Spacing must be greater than Room Marker Size.", this);
+            Debug.LogError("Room Prefab requires RoomInstance.", this);
+            return;
+        }
+
+        if (transitionManager == null)
+        {
+            Debug.LogError("Room Transition Manager is not assigned.", this);
+            return;
+        }
+
+        if (roomSpacing.x <= 0f ||
+            roomSpacing.y <= 0f ||
+            roomSpacing.z <= 0f)
+        {
+            Debug.LogError("Room spacing must be greater than zero.", this);
             return;
         }
 
@@ -79,7 +86,9 @@ public class RoomLayoutGenerator : MonoBehaviour
 
         BuildConnections();
         SpawnRooms();
-        SpawnConnections();
+        ConfigureRooms();
+
+        transitionManager.Initialize(rooms[startPosition]);
 
         Debug.Log($"Generated {rooms.Count} rooms. Seed: {generationSeed}", this);
     }
@@ -92,12 +101,11 @@ public class RoomLayoutGenerator : MonoBehaviour
         {
             foreach (var direction in Directions)
             {
-                var candidatePosition = node.GridPosition + RoomDirectionUtility.GetOffset(direction);
+                var candidatePosition =
+                    node.GridPosition + RoomDirectionUtility.GetOffset(direction);
 
                 if (!rooms.ContainsKey(candidatePosition))
-                {
                     candidatePositions.Add(candidatePosition);
-                }
             }
         }
 
@@ -129,12 +137,11 @@ public class RoomLayoutGenerator : MonoBehaviour
         {
             foreach (var direction in Directions)
             {
-                var neighbourPosition = node.GridPosition + RoomDirectionUtility.GetOffset(direction);
+                var neighbourPosition =
+                    node.GridPosition + RoomDirectionUtility.GetOffset(direction);
 
                 if (rooms.TryGetValue(neighbourPosition, out var neighbour))
-                {
                     node.Connections[direction] = neighbour;
-                }
             }
         }
     }
@@ -148,74 +155,35 @@ public class RoomLayoutGenerator : MonoBehaviour
             var roomObject = Instantiate(
                 roomPrefab,
                 roomPosition,
-                Quaternion.identity,
+                transform.rotation,
                 GetGeneratedParent()
             );
 
-            roomObject.name = $"Room_{node.GridPosition.x}_{node.GridPosition.y}_{node.GridPosition.z}";
+            roomObject.name =
+                $"Room_{node.GridPosition.x}_{node.GridPosition.y}_{node.GridPosition.z}";
+
+            node.Instance = roomObject.GetComponent<RoomInstance>();
         }
     }
 
-    private void SpawnConnections()
+    private void ConfigureRooms()
     {
         foreach (var node in rooms.Values)
         {
-            foreach (var direction in PositiveDirections)
-            {
-                if (node.Connections.TryGetValue(direction, out var neighbour))
-                {
-                    CreateConnection(node, neighbour);
-                }
-            }
-        }
-    }
-
-    private void CreateConnection(RoomNode first, RoomNode second)
-    {
-        var firstPosition = GetWorldPosition(first.GridPosition);
-        var secondPosition = GetWorldPosition(second.GridPosition);
-
-        var gridDirection = second.GridPosition - first.GridPosition;
-
-        var connectorLength = roomSpacing - roomMarkerSize;
-
-        var connectorScale = new Vector3(
-            connectionWidth,
-            connectionWidth,
-            connectionWidth
-        );
-
-        if (gridDirection.x != 0)
-            connectorScale.x = connectorLength;
-        else if (gridDirection.y != 0)
-            connectorScale.y = connectorLength;
-        else
-            connectorScale.z = connectorLength;
-
-        var connector = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
-        connector.name = "RoomConnection";
-        connector.transform.SetParent(GetGeneratedParent(), true);
-        connector.transform.position = (firstPosition + secondPosition) * 0.5f;
-        connector.transform.localScale = connectorScale;
-
-        var collider = connector.GetComponent<Collider>();
-
-        if (collider != null)
-        {
-            if (Application.isPlaying)
-                Destroy(collider);
-            else
-                DestroyImmediate(collider);
+            node.Instance.Configure(node, transitionManager);
+            node.Instance.SetRoomActive(false);
         }
     }
 
     private Vector3 GetWorldPosition(Vector3Int gridPosition)
     {
-        var localPosition = new Vector3(
-            gridPosition.x * roomSpacing,
-            gridPosition.y * roomSpacing,
-            gridPosition.z * roomSpacing
+        var localPosition = Vector3.Scale(
+            new Vector3(
+                gridPosition.x,
+                gridPosition.y,
+                gridPosition.z
+            ),
+            roomSpacing
         );
 
         return transform.TransformPoint(localPosition);
@@ -235,9 +203,14 @@ public class RoomLayoutGenerator : MonoBehaviour
             var child = parent.GetChild(index).gameObject;
 
             if (Application.isPlaying)
+            {
+                child.SetActive(false);
                 Destroy(child);
+            }
             else
+            {
                 DestroyImmediate(child);
+            }
         }
     }
 }
