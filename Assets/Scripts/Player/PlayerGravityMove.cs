@@ -8,17 +8,24 @@ public class PlayerGravityFlip : MonoBehaviour
     public KeyCode flipKey = KeyCode.Space;
 
     private Rigidbody2D rb;
+    private PlayerDash dash;
     private float moveInput;
     private bool isUpsideDown;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        dash = GetComponent<PlayerDash>();
         rb.gravityScale = gravityMagnitude;
     }
 
     private void Update()
     {
+        if (dash != null && dash.IsDashing)
+        {
+            return;
+        }
+
         moveInput = Input.GetAxisRaw("Horizontal");
 
         if (Input.GetKeyDown(flipKey))
@@ -33,6 +40,11 @@ public class PlayerGravityFlip : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (dash != null && dash.IsDashing)
+        {
+            return;
+        }
+
         var velocity = rb.linearVelocity;
         velocity.x = moveInput * moveSpeed;
         rb.linearVelocity = velocity;
