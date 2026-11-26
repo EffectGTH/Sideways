@@ -6,7 +6,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerDash : MonoBehaviour
 {
-    public float dashSpeed = 24f;
+    public float dashSpeed = 22f;
     public float dashDuration = 0.14f;
     public float dashCooldown = 1.2f;
     public float postDashDrag = 0.45f;
@@ -14,6 +14,7 @@ public class PlayerDash : MonoBehaviour
     public Image cooldownFillImage;
 
     private Rigidbody2D rb;
+    private MonoBehaviour moveScript;
     private Vector2 facingDirection = Vector2.right;
     private float cooldownTimer;
     private bool isDashing;
@@ -23,6 +24,7 @@ public class PlayerDash : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        moveScript = GetComponent("PlayerGravityMove") as MonoBehaviour;
     }
 
     private void Update()
@@ -83,6 +85,11 @@ public class PlayerDash : MonoBehaviour
         isDashing = true;
         cooldownTimer = dashCooldown;
 
+        if (moveScript != null)
+        {
+            moveScript.enabled = false;
+        }
+
         var originalGravity = rb.gravityScale;
         rb.gravityScale = 0f;
 
@@ -96,6 +103,12 @@ public class PlayerDash : MonoBehaviour
 
         rb.gravityScale = originalGravity;
         rb.linearVelocity *= postDashDrag;
+
+        if (moveScript != null)
+        {
+            moveScript.enabled = true;
+        }
+
         isDashing = false;
     }
 
