@@ -12,6 +12,7 @@ public class RoomPortal : MonoBehaviour
 
     private RoomNode sourceRoom;
     private RoomNode targetRoom;
+
     private RoomTransitionManager transitionManager;
     private bool isRoomActive;
 
@@ -39,6 +40,10 @@ public class RoomPortal : MonoBehaviour
     {
         sourceRoom = source;
         targetRoom = target;
+        Debug.Log(
+            $"Room: {source.GridPosition} | Direction: {direction} | Target: {(target == null ? "NONE" : target.GridPosition.ToString())}",
+            this
+        );
         transitionManager = manager;
 
         if (openVisual != null)

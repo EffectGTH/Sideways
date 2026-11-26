@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class RoomInstance : MonoBehaviour
 {
+    [SerializeField] private Transform visualsRoot;
     [SerializeField] private Transform physicsRoot;
     [SerializeField] private Transform portalsRoot;
 
@@ -57,5 +58,11 @@ public class RoomInstance : MonoBehaviour
         {
             portal.SetRoomActive(active);
         }
+    }
+
+    public void SetRoomVisible(bool visible)
+    {
+        if (visualsRoot != null)
+            visualsRoot.gameObject.SetActive(visible);
     }
 }

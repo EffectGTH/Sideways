@@ -45,6 +45,7 @@ public class RoomTransitionManager : MonoBehaviour
                        currentRoom.transform.position;
 
         currentRoom.SetRoomActive(true);
+        currentRoom.SetRoomVisible(true);
     }
 
     public void TryTransition(
@@ -91,6 +92,7 @@ public class RoomTransitionManager : MonoBehaviour
         playerBody.simulated = false;
 
         previousRoom.SetRoomActive(false);
+        nextRoom.SetRoomVisible(true);
 
         var startPlayerPosition = player.position;
         var targetPlayerPosition = targetSpawn.position;
@@ -131,9 +133,12 @@ public class RoomTransitionManager : MonoBehaviour
             targetPlayerPosition.y
         );
 
+        previousRoom.SetRoomVisible(false);
+
         currentRoom = nextRoom;
 
         currentRoom.SetRoomActive(true);
+        currentRoom.SetRoomVisible(true);
 
         Physics2D.SyncTransforms();
 

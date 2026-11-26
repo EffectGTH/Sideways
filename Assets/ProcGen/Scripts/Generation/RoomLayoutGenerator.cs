@@ -166,14 +166,17 @@ public class RoomLayoutGenerator : MonoBehaviour
         }
     }
 
+
     private void ConfigureRooms()
     {
         foreach (var node in rooms.Values)
         {
             node.Instance.Configure(node, transitionManager);
             node.Instance.SetRoomActive(false);
+            node.Instance.SetRoomVisible(false);
         }
     }
+
 
     private Vector3 GetWorldPosition(Vector3Int gridPosition)
     {
