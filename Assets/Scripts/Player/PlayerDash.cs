@@ -6,16 +6,19 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerDash : MonoBehaviour
 {
-    public float dashSpeed = 16f;
-    public float dashDuration = 0.16f;
-    public float dashCooldown = 1.5f;
+    public float dashSpeed = 24f;
+    public float dashDuration = 0.14f;
+    public float dashCooldown = 1.2f;
+    public float postDashDrag = 0.45f;
     public Key dashKey = Key.LeftShift;
     public Image cooldownFillImage;
 
     private Rigidbody2D rb;
-    private float facingDirection = 1f;
+    private Vector2 facingDirection = Vector2.right;
     private float cooldownTimer;
     private bool isDashing;
+
+    public bool IsDashing => isDashing;
 
     private void Awake()
     {
@@ -30,13 +33,10 @@ public class PlayerDash : MonoBehaviour
             return;
         }
 
-        var left = keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed ? -1f : 0f;
-        var right = keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed ? 1f : 0f;
-        var horizontal = left + right;
-
-        if (!isDashing && Mathf.Abs(horizontal) > 0.01f)
+        var moveInput = ReadMoveInput(keyboard);
+        if (!isDashing && moveInput.sqrMagnitude > 0.001f)
         {
-            facingDirection = Mathf.Sign(horizontal);
+            facingDirection = moveInput.normalized;
         }
 
         if (cooldownTimer > 0f)
@@ -48,11 +48,37 @@ public class PlayerDash : MonoBehaviour
 
         if (!isDashing && cooldownTimer <= 0f && keyboard[dashKey].wasPressedThisFrame)
         {
-            StartCoroutine(DashRoutine());
+            var dashDir = moveInput.sqrMagnitude > 0.001f ? moveInput.normalized : facingDirection;
+            StartCoroutine(DashRoutine(dashDir));
         }
     }
 
-    private IEnumerator DashRoutine()
+    private Vector2 ReadMoveInput(Keyboard keyboard)
+    {
+        var x = 0f;
+        if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+        {
+            x -= 1f;
+        }
+        if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+        {
+            x += 1f;
+        }
+
+        var y = 0f;
+        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+        {
+            y -= 1f;
+        }
+        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+        {
+            y += 1f;
+        }
+
+        return new Vector2(x, y);
+    }
+
+    private IEnumerator DashRoutine(Vector2 direction)
     {
         isDashing = true;
         cooldownTimer = dashCooldown;
@@ -63,16 +89,13 @@ public class PlayerDash : MonoBehaviour
         var elapsed = 0f;
         while (elapsed < dashDuration)
         {
-            var velocity = rb.linearVelocity;
-            velocity.x = facingDirection * dashSpeed;
-            velocity.y = 0f;
-            rb.linearVelocity = velocity;
-
+            rb.linearVelocity = direction * dashSpeed;
             elapsed += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
 
         rb.gravityScale = originalGravity;
+        rb.linearVelocity *= postDashDrag;
         isDashing = false;
     }
 
