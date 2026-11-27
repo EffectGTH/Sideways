@@ -16,9 +16,31 @@ public class MiniMapController : MonoBehaviour
     [SerializeField] private Transform mapContent;
 
     [SerializeField] private KeyCode toggleKey = KeyCode.M;
-    [SerializeField] private float mapSpacing = 2.5f;
-    [SerializeField] private float roomMarkerSize = 0.7f;
+    [SerializeField] private float mapSpacing = 3.2f;
+    [SerializeField] private float depthSpacingMultiplier = 1.5f;
+    [SerializeField] private float roomMarkerSize = 0.55f;
     [SerializeField] private float connectionThickness = 0.12f;
+
+    [SerializeField] private float rotationSensitivity = 4f;
+    [SerializeField] private float minCameraPitch = 10f;
+    [SerializeField] private float maxCameraPitch = 80f;
+    [SerializeField] private float zoomSensitivity = 5f;
+    [SerializeField] private float minMapZoom = 3f;
+    [SerializeField] private float maxMapZoom = 150f;
+
+    [SerializeField] private Rigidbody2D playerBody;
+    [SerializeField] private Behaviour[] behavioursToDisable;
+    [SerializeField] private bool pauseWholeGameWhenOpen;
+
+    private bool[] previousBehaviourStates;
+    private bool previousPlayerSimulation;
+    private float previousTimeScale = 1f;
+
+    private Vector3 mapCenter;
+    private float cameraDistance;
+    private float orbitYaw = 135f;
+    private float orbitPitch = 35f;
+
 
     [SerializeField] private Color visitedRoomColor = new Color(0.12f, 0.3f, 0.42f);
     [SerializeField] private Color currentRoomColor = new Color(0.1f, 0.7f, 0.85f);
@@ -83,13 +105,20 @@ public class MiniMapController : MonoBehaviour
         }
     }
 
+
     private void Update()
     {
         if (Input.GetKeyDown(toggleKey))
         {
             SetMapOpen(!isOpen);
         }
+
+        if (isOpen)
+        {
+            HandleMapInput();
+        }
     }
+
 
     public void Initialize(IEnumerable<RoomNode> nodes)
     {
@@ -190,7 +219,12 @@ public class MiniMapController : MonoBehaviour
         var secondPosition = GetMapPosition(second.GridPosition);
 
         var direction = secondPosition - firstPosition;
-        var connectorLength = Mathf.Max(0.05f, mapSpacing - roomMarkerSize);
+        var connectorLength = Mathf.Max(
+            0.05f,
+            (direction.x != 0 || direction.y != 0
+                ? mapSpacing
+                : mapSpacing * depthSpacingMultiplier) - roomMarkerSize
+        );
 
         var connectorScale = Vector3.one * connectionThickness;
 
@@ -269,15 +303,45 @@ public class MiniMapController : MonoBehaviour
         FrameCameraToVisitedRooms();
     }
 
+
     private void SetMapOpen(bool open)
     {
+        if (isOpen == open)
+            return;
+
         isOpen = open;
 
         mapPanel.SetActive(isOpen);
         mapCamera.enabled = isOpen;
 
         if (isOpen)
+        {
+            if (playerBody != null)
+            {
+                previousPlayerSimulation = playerBody.simulated;
+                playerBody.simulated = false;
+            }
+
+            DisableGameplayBehaviours();
+
+            if (pauseWholeGameWhenOpen)
+            {
+                previousTimeScale = Time.timeScale;
+                Time.timeScale = 0f;
+            }
+
             FrameCameraToVisitedRooms();
+        }
+        else
+        {
+            if (pauseWholeGameWhenOpen)
+                Time.timeScale = previousTimeScale;
+
+            if (playerBody != null)
+                playerBody.simulated = previousPlayerSimulation;
+
+            RestoreGameplayBehaviours();
+        }
     }
 
     private void FrameCameraToVisitedRooms()
@@ -311,22 +375,22 @@ public class MiniMapController : MonoBehaviour
         if (!hasVisitedRoom)
             return;
 
-        var center = (minimum + maximum) * 0.5f;
+        mapCenter = (minimum + maximum) * 0.5f;
+
         var radius = (maximum - minimum).magnitude * 0.5f;
-        var distance = Mathf.Max(8f, radius * 2f + 6f);
 
-        mapCamera.transform.position = center +
-            new Vector3(distance, distance, -distance * 0.7f);
+        cameraDistance = Mathf.Max(20f, radius * 3f + 10f);
 
-        mapCamera.transform.LookAt(center, Vector3.up);
-
-        mapCamera.orthographicSize = Mathf.Max(
-            2.5f,
-            radius * 1.4f + 1.5f
+        mapCamera.orthographicSize = Mathf.Clamp(
+            radius * 1.35f + 1.5f,
+            minMapZoom,
+            maxMapZoom
         );
 
         mapCamera.nearClipPlane = 0.1f;
         mapCamera.farClipPlane = 1000f;
+
+        UpdateCameraPose();
     }
 
     private Vector3 GetMapPosition(Vector3Int gridPosition)
@@ -334,7 +398,7 @@ public class MiniMapController : MonoBehaviour
         return new Vector3(
             gridPosition.x * mapSpacing,
             gridPosition.y * mapSpacing,
-            gridPosition.z * mapSpacing
+            gridPosition.z * mapSpacing * depthSpacingMultiplier
         );
     }
 
@@ -398,4 +462,87 @@ public class MiniMapController : MonoBehaviour
         currentIndicators.Clear();
         connections.Clear();
     }
+
+
+    private void HandleMapInput()
+    {
+        if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
+        {
+            var mouseX = Input.GetAxisRaw("Mouse X");
+            var mouseY = Input.GetAxisRaw("Mouse Y");
+
+            orbitYaw += mouseX * rotationSensitivity;
+            orbitPitch -= mouseY * rotationSensitivity;
+
+            orbitPitch = Mathf.Clamp(
+                orbitPitch,
+                minCameraPitch,
+                maxCameraPitch
+            );
+
+            UpdateCameraPose();
+        }
+
+        var scroll = Input.GetAxis("Mouse ScrollWheel");
+
+        if (Mathf.Abs(scroll) > 0.001f)
+        {
+            mapCamera.orthographicSize = Mathf.Clamp(
+                mapCamera.orthographicSize - scroll * zoomSensitivity,
+                minMapZoom,
+                maxMapZoom
+            );
+        }
+    }
+
+    private void UpdateCameraPose()
+    {
+        var pitchRadians = orbitPitch * Mathf.Deg2Rad;
+        var yawRadians = orbitYaw * Mathf.Deg2Rad;
+
+        var direction = new Vector3(
+            Mathf.Cos(pitchRadians) * Mathf.Sin(yawRadians),
+            Mathf.Sin(pitchRadians),
+            Mathf.Cos(pitchRadians) * Mathf.Cos(yawRadians)
+        );
+
+        mapCamera.transform.position = mapCenter + direction * cameraDistance;
+        mapCamera.transform.LookAt(mapCenter, Vector3.up);
+    }
+
+    private void DisableGameplayBehaviours()
+    {
+        if (behavioursToDisable == null)
+            return;
+
+        previousBehaviourStates = new bool[behavioursToDisable.Length];
+
+        for (var index = 0; index < behavioursToDisable.Length; index++)
+        {
+            var behaviour = behavioursToDisable[index];
+
+            if (behaviour == null)
+                continue;
+
+            previousBehaviourStates[index] = behaviour.enabled;
+            behaviour.enabled = false;
+        }
+    }
+
+    private void RestoreGameplayBehaviours()
+    {
+        if (previousBehaviourStates == null)
+            return;
+
+        for (var index = 0; index < behavioursToDisable.Length; index++)
+        {
+            var behaviour = behavioursToDisable[index];
+
+            if (behaviour != null)
+                behaviour.enabled = previousBehaviourStates[index];
+        }
+
+        previousBehaviourStates = null;
+    }
+
 }
