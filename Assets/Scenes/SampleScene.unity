@@ -224,8 +224,8 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 50
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 4
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -701,6 +701,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1221918426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1221918421}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3107a9035a864d542a36d7219fbe298b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerGravityFlip
+  moveSpeed: 6
+  gravityMagnitude: 3
+  flipKey: 32
 --- !u!1 &1284231402
 GameObject:
   m_ObjectHideFlags: 0
@@ -730,7 +745,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b13583848814d684ca7798851aec9402, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomLayoutGenerator
-  roomCount: 20
+  roomCount: 100
   roomSpacing: {x: 10, y: 10, z: 10}
   roomPrefab: {fileID: 5623201536889457314, guid: 9e5ce22555632914e9d034531375d51d, type: 3}
   generatedParent: {fileID: 812834782}

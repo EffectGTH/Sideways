@@ -285,7 +285,7 @@ GameObject:
   - component: {fileID: 2456589851505071189}
   - component: {fileID: 388602743557789857}
   - component: {fileID: 452652425698329414}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WallPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -374,7 +374,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -491,7 +491,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9151457257108858225}
   - component: {fileID: 9208304953092860958}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CeilingRightCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -523,7 +523,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -632,7 +632,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -772,7 +772,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -850,7 +850,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -927,7 +927,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4572004731095661963}
   - component: {fileID: 2947699665913443273}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FloorLeftCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -959,7 +959,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1279,7 +1279,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1489689724692192120}
   - component: {fileID: 3808822476675522585}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: FloorRightCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1311,7 +1311,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1543,7 +1543,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1679,7 +1679,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5432737115713176049}
   - component: {fileID: 1462761470820720374}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CeilingLeftCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1711,7 +1711,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2581,7 +2581,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2718,7 +2718,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -2959,7 +2959,7 @@ GameObject:
   - component: {fileID: 8050607017092067566}
   - component: {fileID: 2639623282216694946}
   - component: {fileID: 5314751186432494552}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: WallPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3048,7 +3048,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 22e06e4d757c87246a2bc00162ed0954, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

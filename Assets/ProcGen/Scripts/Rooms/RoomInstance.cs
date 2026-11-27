@@ -64,5 +64,8 @@ public class RoomInstance : MonoBehaviour
     {
         if (visualsRoot != null)
             visualsRoot.gameObject.SetActive(visible);
+
+        if (portalsRoot != null)
+            portalsRoot.gameObject.SetActive(visible);
     }
 }
