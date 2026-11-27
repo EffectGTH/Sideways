@@ -15,16 +15,14 @@ public class RoomLayoutGenerator : MonoBehaviour
         RoomDirection.Back
     };
 
-    [Header("Generation Settings")]
     [SerializeField, Min(1)] private int roomCount = 15;
     [SerializeField] private Vector3 roomSpacing = new Vector3(10f, 10f, 10f);
 
-    [Header("References")]
     [SerializeField] private GameObject roomPrefab;
     [SerializeField] private Transform generatedParent;
     [SerializeField] private RoomTransitionManager transitionManager;
+    [SerializeField] private MiniMapController miniMapController;
 
-    [Header("Random Settings")]
     [SerializeField] private bool useFixedSeed = true;
     [SerializeField] private int fixedSeed = 12345;
 
@@ -87,6 +85,8 @@ public class RoomLayoutGenerator : MonoBehaviour
         BuildConnections();
         SpawnRooms();
         ConfigureRooms();
+
+        miniMapController.Initialize(rooms.Values);
 
         transitionManager.Initialize(rooms[startPosition]);
 

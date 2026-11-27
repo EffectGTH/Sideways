@@ -3,11 +3,10 @@ using UnityEngine;
 
 public class RoomTransitionManager : MonoBehaviour
 {
-    [Header("References")]
     [SerializeField] private Transform player;
     [SerializeField] private Camera roomCamera;
+    [SerializeField] private MiniMapController miniMapController;
 
-    [Header("Transition Settings")]
     [SerializeField] private float transitionDuration = 0.8f;
     [SerializeField] private AnimationCurve transitionCurve =
         AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
@@ -40,6 +39,7 @@ public class RoomTransitionManager : MonoBehaviour
         }
 
         currentRoom = startNode.Instance;
+        miniMapController.SetCurrentRoom(startNode);
 
         cameraOffset = roomCamera.transform.position -
                        currentRoom.transform.position;
@@ -139,6 +139,7 @@ public class RoomTransitionManager : MonoBehaviour
 
         currentRoom.SetRoomActive(true);
         currentRoom.SetRoomVisible(true);
+        miniMapController.SetCurrentRoom(targetRoom);
 
         Physics2D.SyncTransforms();
 

@@ -11,8 +11,11 @@ public class RoomNode
 
     public RoomInstance Instance { get; set; }
 
+    public bool IsVisited { get; set; }
+
     public RoomNode(Vector3Int gridPosition)
     {
         GridPosition = gridPosition;
+        IsVisited = false;
     }
 }
